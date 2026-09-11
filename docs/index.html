@@ -1046,6 +1046,72 @@
       color: var(--cyan);
     }
 
+    /* Graphical Report Showcase */
+    .report-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: var(--glass-blur);
+      margin-top: 48px;
+      text-align: left;
+    }
+
+    .report-preview-box {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(0, 229, 255, 0.12);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      background: #08090e;
+    }
+
+    .report-preview-box:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 229, 255, 0.4);
+    }
+
+    .report-preview-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .report-flavor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .report-flavor-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .report-flavor-item strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .report-flavor-item p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    @media (max-width: 800px) {
+      .report-flavor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Responsive */
     @media (max-width: 960px) {
       .spec-strip { grid-template-columns: repeat(2, 1fr); }
@@ -1077,7 +1143,7 @@
       <li><a href="#motivation">Motivation</a></li>
       <li><a href="#methods">Methods</a></li>
       <li><a href="#scaling">Performance</a></li>
-      <li><a href="#cli">CLI Reference</a></li>
+      <li><a href="#cli">CLI & Reports</a></li>
       <li><a href="#applications">Applications</a></li>
       <li><a href="#validation">Validation</a></li>
       <li><a href="#citation">Availability</a></li>
@@ -1381,6 +1447,56 @@
             <!-- Injected by JavaScript -->
           </div>
         </div>
+
+        <!-- Standalone Graphical Reporting Showcase -->
+        <div class="report-card">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 28px;">
+            <div style="max-width: 680px;">
+              <span class="eff-badge" style="color: var(--cyan); border-color: rgba(0, 229, 255, 0.35); background: rgba(0, 229, 255, 0.1);">
+                Zero-Dependency Reporting
+              </span>
+              <h3 style="font-family: 'Fraunces', serif; font-size: 1.85rem; font-weight: 600; color: #fff; margin-bottom: 10px; letter-spacing: -0.01em;">
+                Self-Contained Graphical Outbreak Reports
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                <code>pyeuk report</code> compiles partition stability curves, inline SVG confidence dendrograms, transmission core rosters, and wIBS distance heatmaps into an air-gapped, standalone HTML file. Zero CDN requests, zero external JavaScript, and fully compatible with Galaxy dataset visualizers and offline public health archives.
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <a href="example_report.html" target="_blank" class="btn-pill btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                <span>Open Live Report</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+              <a href="https://github.com/veg/pyeuk" target="_blank" class="btn-pill btn-secondary">
+                View Source
+              </a>
+            </div>
+          </div>
+
+          <div class="report-preview-box">
+            <a href="example_report.html" target="_blank" title="Click to open interactive standalone HTML report">
+              <img src="images/pyeuk_graphical_report.png" alt="PyEuk Self-Contained Graphical Report">
+            </a>
+            <div style="position: absolute; bottom: 14px; right: 14px; background: rgba(12, 13, 20, 0.88); backdrop-filter: blur(8px); border: 1px solid var(--border-subtle); padding: 6px 14px; border-radius: 20px; font-size: 0.76rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace;">
+              ▲ Interactive Report: 24 Cryptosporidium isolates, 10 loci (21.3 KB standalone)
+            </div>
+          </div>
+
+          <div class="report-flavor-grid">
+            <div class="report-flavor-item">
+              <strong>Dashboard Flavor (Default)</strong>
+              <p>Dense epidemiological summary featuring KPI diagnostic metrics, SVG confidence dendrograms, cluster count sweep profiles, transmission cores, and dissimilarity heatmaps.</p>
+            </div>
+            <div class="report-flavor-item">
+              <strong>Clinical Flavor</strong>
+              <p>Focused per-specimen report detailing isolate linkage metrics, closest epidemiological neighbors, and recurrence / transmission classification.</p>
+            </div>
+            <div class="report-flavor-item">
+              <strong>Air-Gapped & Galaxy-Ready</strong>
+              <p>Pure offline execution with embedded base64 heatmaps, native dark/light theme switching, and zero network calls for secure clinical environments.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1618,6 +1734,16 @@
 &nbsp;&nbsp;• Recovered 45 high-depth amplicons from empirical peaks (median coverage: 5,464×).<br>
 &nbsp;&nbsp;• Filtered low-coverage background and non-specific primer binding.<br>
 <span class="term-highlight">✔ Generated de novo panel FASTA (45 amplicons) from alignment peaks.</span>`
+      },
+      {
+        label: "pyeuk report",
+        cmd: "pyeuk report clusters/2026-09-11_SWEEP.json --matrix distance_matrix.tsv --output report.html --flavor dashboard",
+        output: `[1/4] Loading sweep results (K ∈ [5, 9], 4 stable cores, 90% pairs resolved)... Done (0.04s)<br>
+[2/4] Computing hierarchical tree leaf order from pairwise wIBS distance matrix...<br>
+[3/4] Rendering inline SVG confidence tree, sweep stability curves, and base64 heatmap...<br>
+[4/4] Writing zero-dependency standalone HTML report (Galaxy and offline compatible)...<br>
+&nbsp;&nbsp;• Theme: studio (dark default) | Flavor: dashboard | Output size: 21.3 KB.<br>
+<span class="term-highlight">✔ Generated self-contained graphical report: report.html</span>`
       }
     ];
 
