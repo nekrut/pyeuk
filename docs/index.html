@@ -287,7 +287,7 @@
 
     /* Hero */
     section.hero {
-      min-height: 90vh;
+      min-height: clamp(650px, 90vh, 1000px);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -1074,13 +1074,13 @@
       <span>PyEuk</span>
     </a>
     <ul class="nav-links">
-      <li><a href="#why">The Problem</a></li>
-      <li><a href="#what">Architecture</a></li>
-      <li><a href="#efficiency">Performance</a></li>
-      <li><a href="#cli">CLI Simulator</a></li>
-      <li><a href="#use-cases">Case Studies</a></li>
-      <li><a href="#benchmarks">Validation</a></li>
-      <li><a href="#citation">Citation</a></li>
+      <li><a href="#motivation">Motivation</a></li>
+      <li><a href="#methods">Methods</a></li>
+      <li><a href="#scaling">Performance</a></li>
+      <li><a href="#cli">CLI Reference</a></li>
+      <li><a href="#applications">Applications</a></li>
+      <li><a href="#validation">Validation</a></li>
+      <li><a href="#citation">Availability</a></li>
     </ul>
     <div class="nav-actions">
       <a href="https://usegalaxy.org" class="btn-pill btn-galaxy" target="_blank">
@@ -1091,13 +1091,13 @@
   </header>
 
   <main>
-    <!-- ACT 1: HERO MANIFESTO -->
+    <!-- HERO SECTION -->
     <section class="hero">
       <div class="hero-brand-mark">
         <img src="images/pyeuk_logo.jpg" alt="PyEuk Logo" class="hero-logo-img">
       </div>
       <div class="badge-pill">
-        <span class="live-dot"></span> Next-Generation Eukaryotic Surveillance
+        <span class="live-dot"></span> Catalogue-Free Molecular Surveillance
       </div>
       <h1 class="hero-title">
         Multilocus Eukaryotic Typing <br>
@@ -1133,89 +1133,89 @@
       <!-- 4-Column Spec Strip -->
       <div class="spec-strip">
         <div class="spec-card">
-          <div class="spec-val">100% De Novo</div>
+          <div class="spec-val">Adaptive</div>
           <div class="spec-lbl">Window Selection</div>
-          <div class="spec-desc">Data-adaptive sub-amplicon coordinates optimized directly from empirical CIGAR read alignments.</div>
+          <div class="spec-desc">Sub-amplicon coordinate intervals optimized directly from empirical read alignment depth and span.</div>
         </div>
         <div class="spec-card">
           <div class="spec-val">wIBS Metric</div>
-          <div class="spec-lbl">Allele Distance</div>
-          <div class="spec-desc">Heterozygosity- and abundance-weighted distance natively handling polyclonality without diploid constraints.</div>
+          <div class="spec-lbl">Continuous Distance</div>
+          <div class="spec-desc">Abundance-weighted identity-by-state distance accounting for intra-host mixtures without diploid assumptions.</div>
         </div>
         <div class="spec-card">
-          <div class="spec-val">B=200 Sweep</div>
+          <div class="spec-val">Resampling</div>
           <div class="spec-lbl">Stability Sweep</div>
-          <div class="spec-desc">Monte Carlo subsampling (85%) extracting persistent transmission cores with $\ge 90\%$ edge stability.</div>
+          <div class="spec-desc">Monte Carlo subsampling sweep ($B = 200$, 85% subsample) extracting transmission cores with $\ge 90\%$ support.</div>
         </div>
         <div class="spec-card">
-          <div class="spec-val">4 Min / 8k</div>
-          <div class="spec-lbl">Numba Acceleration</div>
-          <div class="spec-desc">Computes 8,325-specimen distance matrix in 4.0 minutes and full clustering sweep in 70 minutes on 16 cores.</div>
+          <div class="spec-val">4.0 min / 8.3k</div>
+          <div class="spec-lbl">Vectorized Scaling</div>
+          <div class="spec-desc">Computes pairwise distance matrix for 8,325 specimens in 4.0 minutes and complete sweep in 70 minutes on 16 cores.</div>
         </div>
       </div>
     </section>
 
-    <!-- ACT 2: THE PROBLEM & PARADIGM SHIFT (WHY NOW?) -->
-    <section id="why" class="chapter">
+    <!-- MOTIVATION -->
+    <section id="motivation" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act I &mdash; The Scalability & Portability Barrier</span>
-        <h2 class="chapter-heading">When Classical MLST <br><span class="text-gradient">Hits Eukaryotic Reality.</span></h2>
+        <span class="chapter-tag">Motivation</span>
+        <h2 class="chapter-heading">Multilocus Typing in <br><span class="text-gradient">Complex Eukaryotes.</span></h2>
         <p class="chapter-lead">
-          Traditional molecular typing frameworks were forged on haploid bacteria. When transferred to eukaryotic parasites characterized by sexual recombination, extensive within-host polyclonality, dynamic somy variation, and tandem-repeat arrays, they fail.
+          Multilocus sequence typing (MLST) frameworks originally designed for haploid bacteria face substantial challenges when applied to eukaryotic parasites. Sexual recombination, extensive within-host polyclonality, copy-number variation, and dynamic somy violate the assumptions of discrete, catalogue-based typing.
         </p>
 
         <!-- Math Presentation Card -->
         <div class="math-card">
-          <div class="math-label">The Discrete Genotype Bottleneck</div>
-          $$G_{ij} \in \{0, 1, 2\} \implies \text{Minor Clones Lost} \quad \& \quad \text{Uncatalogued Alleles } \to \text{Dropout}$$
+          <div class="math-label">Discrete Genotyping vs. Intra-Host Mixtures</div>
+          $$G_{ij} \in \{0, 1, 2\} \implies \text{Information Loss for Minor Lineages \& Uncatalogued Variation}$$
           <p class="math-expl">
-            Forcing continuous sequencing read depths into binary presence or discrete diploid genotypes discards multi-site physical phase, blinds surveillance to minor drug-resistant clones ($< 20\%$), and causes catastrophic typing dropouts whenever a specimen harbors novel uncatalogued alleles.
+            Discretizing read depths into binary presence or fixed diploid genotypes discards multi-site physical phase, obscures minor-frequency lineages ($< 20\%$), and leads to uncalled loci whenever a specimen harbors novel or uncatalogued alleles.
           </p>
         </div>
 
         <div class="compare-grid">
           <div class="card-legacy">
             <div>
-              <div class="tag">The Broken Status Quo</div>
-              <h3>Catalogue-Bound MLST</h3>
+              <div class="tag">Reference Catalogue Approach</div>
+              <h3>Pre-Compiled Allele Catalogues</h3>
               <ul class="legacy-list">
-                <li><span class="icon-cross">&times;</span> Requires pre-compiled static reference allele databases; uncatalogued mutations cause typing dropouts.</li>
-                <li><span class="icon-cross">&times;</span> Demands discrete diploid/haploid genotype calls, destroying intra-host minor clone dynamics.</li>
-                <li><span class="icon-cross">&times;</span> Discards physical phase across adjacent polymorphic sites within the same read.</li>
-                <li><span class="icon-cross">&times;</span> Bound to fragile custom laboratory pipelines; breaks on primer panel revisions.</li>
+                <li><span class="icon-cross">&times;</span> Relies on pre-compiled reference allele databases; uncatalogued mutations cause missing data or classification failure.</li>
+                <li><span class="icon-cross">&times;</span> Imposes discrete haploid or diploid genotype calls, obscuring intra-host mixture dynamics.</li>
+                <li><span class="icon-cross">&times;</span> Discards read-backed physical phase across polymorphic sites within individual reads.</li>
+                <li><span class="icon-cross">&times;</span> Assay-specific pipelines require manual curation and database updates upon panel revisions.</li>
               </ul>
             </div>
             <div style="margin-top: 24px; font-size: 0.82rem; color: #f87171;">
-              <strong>Outcome:</strong> Inability to resolve multi-state outbreaks or track co-infecting parasite lineages.
+              <strong>Limitation:</strong> Reduced resolution in complex polyclonal infections and limited cross-laboratory portability.
             </div>
           </div>
 
           <div class="card-future">
             <div>
-              <div class="tag">The PyEuk Paradigm</div>
-              <h3>Catalogue-Free Microhaplotyping</h3>
+              <div class="tag">Catalogue-Free Framework</div>
+              <h3>PyEuk Microhaplotyping</h3>
               <ul class="future-list">
-                <li><span class="icon-check">&#10003;</span> 100% data-adaptive window discovery directly from empirical CIGAR read alignments.</li>
-                <li><span class="icon-check">&#10003;</span> Continuous abundance-weighted allele sharing (wIBS) retaining minor clones down to 5% frequency.</li>
-                <li><span class="icon-check">&#10003;</span> Preserves physical phase across multi-codon intervals, capturing linked epistatic resistance.</li>
-                <li><span class="icon-check">&#10003;</span> Panel-independent architecture running across amplicon panels, target capture, and long-read data.</li>
+                <li><span class="icon-check">&#10003;</span> Discovers typing windows directly from empirical read alignment coordinates without pre-defined allele catalogs.</li>
+                <li><span class="icon-check">&#10003;</span> Employs an abundance-weighted allele sharing distance (wIBS) retaining minor lineages down to 5% frequency.</li>
+                <li><span class="icon-check">&#10003;</span> Maintains physical phase across multi-site intervals within read-spanning windows.</li>
+                <li><span class="icon-check">&#10003;</span> Panel-independent design applicable to amplicon panels, target capture, and long-read data.</li>
               </ul>
             </div>
             <div style="margin-top: 24px; font-size: 0.85rem; color: var(--cyan);">
-              <strong>Breakthrough:</strong> Near-perfect outbreak separation (ARI = 0.9737) and 283 transmission cores across 8,325 surveillance genomes.
+              <strong>Concordance:</strong> High agreement with published epidemiologic investigations (ARI = 0.9737 on 153-isolate outbreak panel) and identification of 283 transmission cores across 8,325 surveillance isolates.
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ACT 3: FOUNDATION ARCHITECTURE (WHAT IS IT?) -->
-    <section id="what" class="chapter">
+    <!-- METHODOLOGY -->
+    <section id="methods" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act II &mdash; Algorithmic Foundation</span>
-        <h2 class="chapter-heading">The Four Mathematical Pillars <br><span class="text-gradient">of Continuous Microhaplotyping.</span></h2>
+        <span class="chapter-tag">Methodology</span>
+        <h2 class="chapter-heading">Algorithmic Architecture: <br><span class="text-gradient">From Alignments to Transmission Cores.</span></h2>
         <p class="chapter-lead">
-          From raw FASTQ reads to transmission cores: an end-to-end mathematical pipeline designed for complex eukaryote genomics.
+          PyEuk structures multilocus surveillance into four modular computational stages: empirical window definition, phase-preserved haplotype extraction, weighted distance calculation, and stability-tested cluster sweeps.
         </p>
 
         <div class="arch-pillars-grid">
@@ -1223,17 +1223,17 @@
           <div class="arch-card">
             <div class="arch-card-header">
               <div class="arch-number">1</div>
-              <h3>Dynamic Window Placement</h3>
+              <h3>Data-Adaptive Window Placement</h3>
             </div>
             <p>
-              Sub-amplicon coordinate intervals are scored by maximizing haplotype width while enforcing balanced spanning read support:
+              Sub-amplicon coordinate intervals are selected by optimizing window width subject to spanning read coverage across specimens:
             </p>
             <div class="math-card" style="margin: 12px 0 16px;">
               <div class="math-label">Optimization Objective</div>
               $$S = \text{width} \times f_{\text{span}}, \quad f_{\text{span}} \ge 0.30$$
             </div>
             <p>
-              Strand-aware anchor shifts eliminate primer-initiation asymmetry, shifting anchors to recover dense windows with up to 97.6% spanning coverage.
+              Strand-aware anchor adjustments account for primer positions and read-length variation, recovering informative windows with up to 97.6% spanning coverage.
             </p>
             <img src="images/dynamic_window_optimization.png" alt="Dynamic Window Optimization" class="arch-card-img">
           </div>
@@ -1242,17 +1242,17 @@
           <div class="arch-card">
             <div class="arch-card-header">
               <div class="arch-number">2</div>
-              <h3>Phase-Preserved Haplotypes</h3>
+              <h3>Phase-Preserved Haplotype Extraction</h3>
             </div>
             <p>
-              Only reads spanning the coordinate interval end-to-end contribute haplotypes. Physical phase across adjacent SNVs and indels is strictly preserved:
+              Only reads spanning coordinate intervals end-to-end contribute haplotypes, preserving multi-site physical phase across adjacent polymorphic sites:
             </p>
             <div class="math-card" style="margin: 12px 0 16px;">
               <div class="math-label">Quality & Abundance Thresholds</div>
               $$\text{MAPQ} \ge 20, \quad N_{\text{span}} \ge 30, \quad f_{\text{hap}} \ge 0.05$$
             </div>
             <p>
-              Indels are left-aligned and normalized. Low-abundance PCR noise is pruned while authentic biological minor clones are retained.
+              Indels are left-aligned and normalized. Low-frequency sequencing noise is filtered while authentic intra-host minor variants are preserved.
             </p>
             <img src="images/window_haplotype_encoding.png" alt="Window Haplotype Encoding" class="arch-card-img">
           </div>
@@ -1261,17 +1261,17 @@
           <div class="arch-card">
             <div class="arch-card-header">
               <div class="arch-number">3</div>
-              <h3>Continuous wIBS Metric</h3>
+              <h3>Abundance-Weighted Distance Metric</h3>
             </div>
             <p>
-              Genetic distance between specimens is computed using an allele-sharing distance weighted by intra-host abundance and locus ploidy:
+              Pairwise genetic distance is computed using an identity-by-state metric weighted by intra-host haplotype frequencies and locus ploidy:
             </p>
             <div class="math-card" style="margin: 12px 0 16px;">
-              <div class="math-label">Abundance-Weighted Distance</div>
-              $$D(u, v) = 1 - \frac{\sum_{w \in W_{uv}} \frac{1}{m_w} \sum_{h \in H_w} \min(a_{uwh}, a_{vwh})}{|W_{uv}|}$$
+              <div class="math-label">Weighted Identity-by-State (wIBS)</div>
+              $$D(u, v) = 1 - \frac{1}{|W_{uv}|} \sum_{w \in W_{uv}} \frac{1}{m_w} \sum_{h \in H_w} \min(a_{uwh}, a_{vwh})$$
             </div>
             <p>
-              Locus ploidy $m_w$ normalizes nuclear ($m_w=2$) and mitochondrial ($m_w=1$) markers, avoiding forced diploid calling.
+              The locus ploidy parameter $m_w$ accommodates differences between haploid organellar ($m_w=1$) and diploid or polyploid nuclear loci ($m_w=2$).
             </p>
             <img src="images/distance_wibs_matrix.png" alt="Distance Matrix" class="arch-card-img">
           </div>
@@ -1280,17 +1280,17 @@
           <div class="arch-card">
             <div class="arch-card-header">
               <div class="arch-number">4</div>
-              <h3>Bootstrapped Stability Sweep</h3>
+              <h3>Resampling-Based Stability Sweep</h3>
             </div>
             <p>
-              Rather than picking an arbitrary tree cut height, PyEuk evaluates co-clustering probability across a continuous distance sweep:
+              Rather than choosing a single arbitrary distance cutoff, PyEuk evaluates clustering consistency across a range of thresholds via Monte Carlo subsampling:
             </p>
             <div class="math-card" style="margin: 12px 0 16px;">
               <div class="math-label">Monte Carlo Stability Criteria</div>
               $$B = 200, \quad \text{Subsample} = 0.85, \quad p_{ij} \ge 0.90$$
             </div>
             <p>
-              Connected-component transmission cores are extracted at high consensus support ($|2p - 1| \ge 0.50$), separating stable transmission chains from background noise.
+              Transmission cores are extracted as connected components supported by consensus co-clustering ($|2p - 1| \ge 0.50$), delineating epidemiologically stable clusters from background noise.
             </p>
             <img src="images/surveillance_tree_cores.png" alt="Transmission Cores" class="arch-card-img">
           </div>
@@ -1298,40 +1298,40 @@
       </div>
     </section>
 
-    <!-- ACT 4: COMPUTATIONAL ARITHMETIC & EFFICIENCY -->
-    <section id="efficiency" class="chapter">
+    <!-- COMPUTATIONAL SCALING & PANEL DISCOVERY -->
+    <section id="scaling" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act III &mdash; Computational Arithmetic & Scaling</span>
-        <h2 class="chapter-heading">Vectorized Array Kernels: <br><span class="text-gradient">From Days to Minutes.</span></h2>
+        <span class="chapter-tag">Computational Performance</span>
+        <h2 class="chapter-heading">Computational Scaling & <br><span class="text-gradient">Empirical Panel Discovery.</span></h2>
         <p class="chapter-lead">
-          Complex likelihood-based Markov solvers or MCMC samplers take days to cluster thousands of eukaryotic genomes. PyEuk computes complete 8,325-specimen distance matrices in 4 minutes.
+          By decoupling window definition and distance calculation into vectorized array operations, PyEuk scales efficiently to large surveillance datasets without requiring computationally intensive Markov chain Monte Carlo mixture models.
         </p>
 
         <div class="efficiency-grid">
           <div class="card-efficiency">
             <div>
-              <div class="eff-badge">Zero External Dependencies</div>
-              <h3>Numba-Accelerated C-Speed Kernels</h3>
+              <div class="eff-badge">Vectorized Distance Kernel</div>
+              <h3>Just-in-Time Compiled Distance Execution</h3>
               <p>
-                Microhaplotype matrices are encoded as sparse presence/absence tensors. Pairwise distance calculations are dispatched to JIT-compiled Numba C kernels with automatic multi-threading.
+                Microhaplotype matrices are structured as numeric arrays, and pairwise distance calculations are evaluated using JIT-compiled Numba kernels with multi-core parallelism.
               </p>
               <p>
-                No external relational database, no BLAST or HMMER dependencies, and no proprietary software wrappers. Pure, reproducible Python.
+                The software runs in standard Python environments without external database engines, proprietary tools, or alignment index dependencies.
               </p>
             </div>
 
             <div class="eff-stats">
               <div class="eff-stat">
                 <div class="eff-stat-val" style="color: var(--cyan);">4.0 min</div>
-                <div class="eff-stat-lbl">Distance Matrix (8k)</div>
+                <div class="eff-stat-lbl">Distance Matrix (8,325 samples)</div>
               </div>
               <div class="eff-stat">
                 <div class="eff-stat-val" style="color: var(--green);">70 min</div>
-                <div class="eff-stat-lbl">B=200 Sweep (8k)</div>
+                <div class="eff-stat-lbl">Resampling Sweep (B = 200)</div>
               </div>
               <div class="eff-stat">
                 <div class="eff-stat-val" style="color: var(--amber);">34.6M</div>
-                <div class="eff-stat-lbl">Pairwise Comparisons</div>
+                <div class="eff-stat-lbl">Pairwise Comparisons (8.3k)</div>
               </div>
             </div>
           </div>
@@ -1339,15 +1339,14 @@
           <div class="card-efficiency">
             <div>
               <div class="eff-badge" style="color: var(--purple); border-color: rgba(157, 78, 221, 0.35); background: rgba(157, 78, 221, 0.12);">
-                Empirical Signal vs. Nominal Design
+                Amplicon Panel Discovery
               </div>
-              <h3>Derived vs. Supplied Panels</h3>
+              <h3>Empirical Coverage vs. Nominal Primer Design</h3>
               <p>
-                Nominal amplicon coordinates often include poorly amplifying primer pairs. PyEuk’s <code>derive-panel</code> discovers empirical coverage peaks, concentrating typing signal on high-depth amplicons:
+                Nominal primer coordinates often include targets with low amplification efficiency or unpredicted read coverage boundaries. PyEuk’s <code>derive-panel</code> subcommand discovers contiguous empirical coverage peaks directly from alignment depth:
               </p>
               <p>
-                Across 153 <em>Cyclospora</em> outbreak libraries, median per-amplicon read depth increased by nearly an order of magnitude:
-                <strong>5,464×</strong> for data-adaptive derived amplicons versus <strong>588×</strong> for the nominal supplied panel.
+                Across 153 <em>Cyclospora</em> outbreak sequencing libraries, median per-amplicon coverage increased from <strong>588×</strong> using nominal primer coordinates to <strong>5,464×</strong> when targeting empirical coverage peaks.
               </p>
             </div>
             <img src="images/derived_vs_supplied_coverage.png" alt="Derived vs Supplied Coverage" style="width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); margin-top: 14px;">
@@ -1356,13 +1355,13 @@
       </div>
     </section>
 
-    <!-- ACT 5: INTERACTIVE CLI TERMINAL SIMULATOR -->
+    <!-- COMMAND-LINE INTERFACE -->
     <section id="cli" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act IV &mdash; Interactive CLI Simulator</span>
-        <h2 class="chapter-heading">Zero-Friction Reproducibility: <br><span class="text-gradient">Modular CLI Architecture.</span></h2>
+        <span class="chapter-tag">Command-Line Interface</span>
+        <h2 class="chapter-heading">Modular Architecture & <br><span class="text-gradient">Command-Line Execution.</span></h2>
         <p class="chapter-lead">
-          Every stage of the PyEuk suite is exposed as a composable, standalone UNIX subcommand. Click the tabs below to simulate live execution:
+          Each analytical stage is provided as an independent command-line subcommand designed for modular execution, shell scripting, and pipeline integration:
         </p>
 
         <div class="terminal-window">
@@ -1385,13 +1384,13 @@
       </div>
     </section>
 
-    <!-- ACT 6: BIOLOGICAL SHOWCASES (CASE STUDIES) -->
-    <section id="use-cases" class="chapter">
+    <!-- VALIDATION & APPLICATIONS -->
+    <section id="applications" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act V &mdash; Biological Reality</span>
-        <h2 class="chapter-heading">Empirical Proof Across <br><span class="text-gradient">Diverse Parasite Systems.</span></h2>
+        <span class="chapter-tag">Applications & Case Studies</span>
+        <h2 class="chapter-heading">Application to Diverse <br><span class="text-gradient">Parasite Surveillance Datasets.</span></h2>
         <p class="chapter-lead">
-          Validated against gold-standard epidemiological tracebacks, national surveillance repositories, and international malaria clinical trials.
+          Evaluated on foodborne protozoan outbreak investigations, multi-year national surveillance archives, and clinical trial cohorts for malaria recurrence.
         </p>
 
         <!-- Case Study Tabs -->
@@ -1406,17 +1405,17 @@
           <div class="case-grid">
             <div>
               <div class="case-badge">Foodborne Enteric Protozoan &bull; 8,325 Genomes</div>
-              <h3 class="case-title">Near-Perfect Outbreak Concordance</h3>
+              <h3 class="case-title">Cyclospora: Outbreak Concordance & 7-Year Surveillance</h3>
               <p class="case-desc">
-                On the 2018 commercial produce outbreak (153 clinical cases investigated by FDA and CDC), PyEuk achieved near-perfect separation between commercial distributor clusters with <strong>Adjusted Rand Index ARI = 0.9737</strong>.
+                On the 2018 commercial produce outbreak (153 clinical cases investigated by the U.S. FDA and CDC), PyEuk separated commercial distributor clusters with an <strong>Adjusted Rand Index of ARI = 0.9737</strong>.
               </p>
               <p class="case-desc">
-                Across 8,325 nationwide surveillance isolates spanning seven consecutive years (2018–2024), PyEuk recovered <strong>283 robust transmission cores</strong> (262 state-annotated), capturing persistent multi-state foodborne distribution chains while resolving cryptic species clades A, B, and C with <strong>ARI = 0.9848</strong>.
+                Across 8,325 nationwide surveillance isolates spanning seven consecutive years (2018–2024), PyEuk identified <strong>283 stable transmission cores</strong> (262 containing state-annotated samples), delineating multi-state distribution chains while resolving cryptic species clades A, B, and C with <strong>ARI = 0.9848</strong>.
               </p>
               <div class="case-stats-row">
                 <div>
                   <div class="eff-stat-val" style="color: var(--cyan);">0.9737</div>
-                  <div class="eff-stat-lbl">Outbreak ARI Concordance</div>
+                  <div class="eff-stat-lbl">Outbreak Cluster ARI</div>
                 </div>
                 <div>
                   <div class="eff-stat-val" style="color: var(--green);">283 Cores</div>
@@ -1435,12 +1434,12 @@
           <div class="case-grid">
             <div>
               <div class="case-badge">Apicomplexan Malaria &bull; 91 Recurrence Pairs</div>
-              <h3 class="case-title">Continental Origin & Recurrence Separation</h3>
+              <h3 class="case-title">Plasmodium vivax: Continental Separation & Recurrence Pairs</h3>
               <p class="case-desc">
-                In <em>Plasmodium vivax</em> (PvAmpSeq assay), PyEuk demonstrated 100% error-free continental separation between South American (Peru) and Western Pacific (Solomon Islands) isolates (<strong>ROC AUC = 1.000, ARI = 0.9712</strong>; 19 Peru cores, 32 Solomon Islands cores).
+                In <em>Plasmodium vivax</em> amplicon data (PvAmpSeq assay), PyEuk separated South American (Peru) and Western Pacific (Solomon Islands) isolates without misclassification (<strong>ROC AUC = 1.000, ARI = 0.9712</strong>; 19 Peru cores, 32 Solomon Islands cores).
               </p>
               <p class="case-desc">
-                Across 91 patient recurrence pairs from a clinical trial, PyEuk cleanly discriminated homologous from heterologous recurrences (<strong>ROC AUC = 0.9080</strong>). On the 495-amplicon CDC AmpliSeq panel, unsupervised typing across 1,960 windows achieved <strong>ARI = 0.8063</strong> concordance with curated transmission groups.
+                Across 91 patient recurrence pairs from a clinical trial, PyEuk discriminated homologous recurrences from heterologous re-infections (<strong>ROC AUC = 0.9080</strong>). On the 495-amplicon CDC AmpliSeq panel, unsupervised analysis across 1,960 windows showed concordance with expert transmission groupings (<strong>ARI = 0.8063</strong>).
               </p>
               <div class="case-stats-row">
                 <div>
@@ -1464,16 +1463,16 @@
           <div class="case-grid">
             <div>
               <div class="case-badge">Veterinary Helminths & Emerging Fungi</div>
-              <h3 class="case-title">Preserving Physical Phase for Drug Resistance</h3>
+              <h3 class="case-title">Multi-Site Phase Preservation in Resistance Targets</h3>
               <p class="case-desc">
-                Unlike single-variant SNP pipelines that collapse adjacent polymorphic sites into unphased frequencies, PyEuk requires sequencing reads to span entire coordinate windows end-to-end.
+                Unlike single-variant SNP pipelines that evaluate polymorphic sites independently, PyEuk requires sequencing reads to span entire coordinate windows end-to-end.
               </p>
               <p class="case-desc">
-                This preserves physical phase across adjacent codons in gastrointestinal nematode targets (such as isotype-1 $\beta$-tubulin codons 167, 198, and 200) and emerging fungal pathogens (<em>Candida auris</em> <em>ERG11</em> and <em>FKS1</em>), clarifying whether resistance mutations reside on the same or distinct circulating haplotypes.
+                This preserves physical phase across adjacent codons in gastrointestinal nematode targets (such as isotype-1 $\beta$-tubulin codons 167, 198, and 200 associated with benzimidazole resistance) and fungal pathogens (e.g. <em>Candida auris</em> <em>ERG11</em> and <em>FKS1</em>), determining whether resistance mutations reside on the same or distinct circulating haplotypes.
               </p>
               <div class="case-stats-row">
                 <div>
-                  <div class="eff-stat-val" style="color: var(--cyan);">100% Phased</div>
+                  <div class="eff-stat-val" style="color: var(--cyan);">Phased</div>
                   <div class="eff-stat-lbl">Within-Window Codons</div>
                 </div>
                 <div>
@@ -1490,32 +1489,32 @@
       </div>
     </section>
 
-    <!-- ACT 7: RIGOROUS VALIDATION & BENCHMARKS -->
-    <section id="benchmarks" class="chapter">
+    <!-- SENSITIVITY ANALYSIS & CROSS-VALIDATION -->
+    <section id="validation" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Act VI &mdash; Rigorous Validation</span>
-        <h2 class="chapter-heading">Engineered for <br><span class="text-gradient">Empirical Generalization.</span></h2>
+        <span class="chapter-tag">Sensitivity & Cross-Validation</span>
+        <h2 class="chapter-heading">Parameter Stability & <br><span class="text-gradient">Empirical Generalization.</span></h2>
         <p class="chapter-lead">
-          Parameter choices are validated through repeated cross-validation and independent blind benchmarking, avoiding in-sample selection bias.
+          Filtering and clustering parameters were evaluated using Monte Carlo cross-validation to assess sensitivity and guard against dataset-specific overfitting.
         </p>
 
         <div class="math-card">
           <div class="math-label">40-Fold Monte Carlo Cross-Validation</div>
           $$\text{Fixed Default }(N_{\text{span}} \ge 30): \quad \text{Held-Out Mean ARI} = 0.8608 \quad (\text{Median} = 0.9237)$$
           <p class="math-expl">
-            Evaluated across 40 independent random Monte Carlo splits (65% train / 35% test; $n_{\text{test}} = 53$). The default threshold fixed in advance achieves performance statistically indistinguishable from split-specific tuning (mean ARI 0.8950), demonstrating exceptional parameter stability on unseen test cohorts.
+            Evaluated across 40 independent random Monte Carlo partitions (65% train / 35% test; $n_{\text{test}} = 53$ isolates). The default threshold fixed in advance achieves performance comparable to split-specific parameter optimization (mean ARI 0.8608 vs. 0.8950), indicating robust generalization to unseen datasets.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ACT 8: INSTALLATION, CITATION & FOOTER -->
+    <!-- AVAILABILITY & CITATION -->
     <section id="citation" class="chapter">
       <div class="container">
-        <span class="chapter-tag">Open Science & Reproducibility</span>
-        <h2 class="chapter-heading">Get Started With PyEuk.</h2>
+        <span class="chapter-tag">Availability & Citation</span>
+        <h2 class="chapter-heading">Installation & Reference.</h2>
         <p class="chapter-lead">
-          Free, open-source, and reproducible. Available right now across all major bioinformatics channels:
+          PyEuk is distributed as an open-source Python package, Bioconda recipe, container image, and interactive Galaxy tools:
         </p>
 
         <div class="terminal-window" style="max-width: 860px; margin-bottom: 40px;">
@@ -1581,7 +1580,7 @@
 [2/3] Evaluating candidate coordinate intervals via strand-aware objective $S = \\text{width} \\times f_{\\text{span}}$...<br>
 &nbsp;&nbsp;• Locus Nu_18S: shifted anchor +24bp to pos 215 (97.6% spanning coverage recovered).<br>
 &nbsp;&nbsp;• Tiled 28 sub-amplicon windows (median width: 270 bp, min span fraction: 0.34).<br>
-<span class="term-highlight">✔ Successfully defined 28 data-adaptive windows without pre-compiled annotations.</span>`
+<span class="term-highlight">✔ Defined 28 data-adaptive windows across candidate loci.</span>`
       },
       {
         label: "pyeuk window-haplotypes",
@@ -1589,8 +1588,8 @@
         output: `[1/3] Filtering BAM alignments (MAPQ ≥ 20, PROPER_PAIR, non-secondary)... Done (1.85s)<br>
 [2/3] Left-aligning indels and extracting window-spanning haplotypes...<br>
 &nbsp;&nbsp;• Specimen C_WI101_18: 2 distinct haplotypes at window Nu_01_w1 (depth: 142 reads).<br>
-&nbsp;&nbsp;• Pruned 14 low-frequency PCR/sequencing artifacts ($f_{\\text{hap}} < 0.05$).<br>
-<span class="term-highlight">✔ Extracted 613 informative microhaplotype columns across 8,325 specimens.</span>`
+&nbsp;&nbsp;• Filtered low-frequency PCR/sequencing background ($f_{\\text{hap}} < 0.05$).<br>
+<span class="term-highlight">✔ Extracted 613 microhaplotype columns across 8,325 specimens.</span>`
       },
       {
         label: "pyeuk distance",
@@ -1599,17 +1598,17 @@
 [2/3] Compiling vectorized Numba wIBS distance kernel ($m_w = 2$ nuclear ploidy)...<br>
 [3/3] Computing 34,649,070 pairwise abundance-weighted distances...<br>
 &nbsp;&nbsp;• Completed 8,325 × 8,325 symmetric matrix in 241.6 seconds (4.02 minutes).<br>
-<span class="term-highlight">✔ Successfully wrote pairwise wIBS distance matrix (min completeness 0.10).</span>`
+<span class="term-highlight">✔ Wrote pairwise wIBS distance matrix (min completeness 0.10).</span>`
       },
       {
         label: "pyeuk cluster-sweep",
         cmd: "pyeuk cluster-sweep -d distance_matrix.tsv -o sweep/ --subsample 0.85 -B 200 --cores-threshold 0.90",
         output: `[1/4] Running Monte Carlo stability sweep ($B = 200$ replicates, 85% subsampling)... Done (58.2m)<br>
 [2/4] Constructing co-clustering consensus adjacency matrix...<br>
-[3/4] Resolving ambiguous pairs via $|2p - 1| \\ge 0.50$ criterion...<br>
+[3/4] Resolving consensus pairs via $|2p - 1| \\ge 0.50$ criterion...<br>
 [4/4] Extracting connected-component transmission cores ($p_{ij} \\ge 0.90$)...<br>
-&nbsp;&nbsp;• Discovered 283 robust transmission cores encompassing 6,368 clinical isolates.<br>
-<span class="term-highlight">✔ Finished clustering sweep: 283 cores identified; 262 state-annotated.</span>`
+&nbsp;&nbsp;• Discovered 283 transmission cores encompassing 6,368 clinical isolates.<br>
+<span class="term-highlight">✔ Clustering sweep complete: 283 transmission cores identified.</span>`
       },
       {
         label: "pyeuk derive-panel",
@@ -1618,7 +1617,7 @@
 [2/3] Identifying contiguous coverage peaks and extracting amplicon extents...<br>
 &nbsp;&nbsp;• Recovered 45 high-depth amplicons from empirical peaks (median coverage: 5,464×).<br>
 &nbsp;&nbsp;• Filtered low-coverage background and non-specific primer binding.<br>
-<span class="term-highlight">✔ Emitted de novo panel FASTA (45 amplicons) for reference-free downstream typing.</span>`
+<span class="term-highlight">✔ Generated de novo panel FASTA (45 amplicons) from alignment peaks.</span>`
       }
     ];
 
