@@ -1459,7 +1459,7 @@
                 Self-Contained Graphical Outbreak Reports
               </h3>
               <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">
-                <code>pyeuk report</code> compiles partition stability curves, inline SVG confidence dendrograms, transmission core rosters, and wIBS distance heatmaps into an air-gapped, standalone HTML file. Zero CDN requests, zero external JavaScript, and fully compatible with Galaxy dataset visualizers and offline public health archives.
+                <code>pyeuk report</code> compiles partition stability curves, inline SVG confidence dendrograms, transmission core rosters, and wIBS distance heatmaps into an air-gapped, standalone HTML file. Evaluated here on 153 clinical isolates from the 2018 multistate foodborne outbreak investigation: zero CDN requests, zero external JavaScript, and fully compatible with Galaxy dataset visualizers and offline public health archives.
               </p>
             </div>
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
@@ -1478,7 +1478,7 @@
               <img src="images/pyeuk_graphical_report.png" alt="PyEuk Self-Contained Graphical Report">
             </a>
             <div style="position: absolute; bottom: 14px; right: 14px; background: rgba(12, 13, 20, 0.88); backdrop-filter: blur(8px); border: 1px solid var(--border-subtle); padding: 6px 14px; border-radius: 20px; font-size: 0.76rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace;">
-              ▲ Interactive Report: 24 Cryptosporidium isolates, 10 loci (21.3 KB standalone)
+              ▲ Interactive Report: Cyclospora 2018 outbreak (153 clinical specimens, 8 loci, 87.7 KB standalone)
             </div>
           </div>
 
@@ -1737,12 +1737,12 @@
       },
       {
         label: "pyeuk report",
-        cmd: "pyeuk report clusters/2026-09-11_SWEEP.json --matrix distance_matrix.tsv --output report.html --flavor dashboard",
-        output: `[1/4] Loading sweep results (K ∈ [5, 9], 4 stable cores, 90% pairs resolved)... Done (0.04s)<br>
-[2/4] Computing hierarchical tree leaf order from pairwise wIBS distance matrix...<br>
+        cmd: "pyeuk report sweep/2018_cyclospora_sweep.json --matrix distance_matrix.tsv --output report.html --flavor dashboard",
+        output: `[1/4] Loading sweep results (153 specimens, K ∈ [4, 7], 9 stable cores, 77% pairs resolved)... Done (0.08s)<br>
+[2/4] Computing hierarchical tree leaf order from 153×153 pairwise wIBS distance matrix...<br>
 [3/4] Rendering inline SVG confidence tree, sweep stability curves, and base64 heatmap...<br>
 [4/4] Writing zero-dependency standalone HTML report (Galaxy and offline compatible)...<br>
-&nbsp;&nbsp;• Theme: studio (dark default) | Flavor: dashboard | Output size: 21.3 KB.<br>
+&nbsp;&nbsp;• Theme: studio (dark default) | Flavor: dashboard | Output size: 87.7 KB.<br>
 <span class="term-highlight">✔ Generated self-contained graphical report: report.html</span>`
       }
     ];
