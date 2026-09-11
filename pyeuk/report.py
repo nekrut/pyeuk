@@ -449,9 +449,11 @@ def _facts(r, D):
             f"cores; {pr}% of specimen pairs resolved."
         )
     else:
-        spread_hi = max(sel.values()) if sel else "?"
+        valid_sel = [v for v in sel.values() if isinstance(v, (int, float))]
+        spread_hi = max(valid_sel) if valid_sel else "?"
+        spread_lo = min(valid_sel) if valid_sel else (sel.get("knee") or "?")
         blurb = (
-            f"Independent selectors scatter ({sel.get('knee', '?')}&ndash;{spread_hi}); the "
+            f"Independent selectors scatter ({spread_lo}&ndash;{spread_hi}); the "
             f"tree resolves {r.get('count_at_solid_support', '?')} groups at full support and "
             f"{r.get('count_at_moderate_support', '?')} including moderate splits. "
             f"{r.get('n_stable_cores', 0)} stable cores; {pr}% of pairs resolved."
@@ -707,7 +709,9 @@ def _flavor_narrative(f, theme):
         report = f"<b>{point} clusters, with confidence.</b>"
         h2 = "Why a single number?"
     else:
-        spread_hi = max(sel.values()) if sel else "?"
+        valid_sel = [v for v in sel.values() if isinstance(v, (int, float))]
+        spread_hi = max(valid_sel) if valid_sel else "?"
+        spread_lo = min(valid_sel) if valid_sel else (sel.get("knee") or "?")
         h1 = (
             f"The data supports {f['lo']} to {f['hi']} groups &mdash; and says so, instead of "
             f"guessing one."
@@ -718,9 +722,9 @@ def _flavor_narrative(f, theme):
             "the <b>structure it is sure of</b>, and draws its <b>own uncertainty</b> into the tree."
         )
         why = (
-            f"Independent ways of choosing a count disagree: the knee says <b>{sel.get('knee', '?')}</b>, "
+            f"Independent ways of choosing a count disagree: the knee says <b>{sel.get('knee') or 'none'}</b>, "
             f"silhouette <b>{sel.get('silhouette', '?')}</b>, the gap statistic <b>{sel.get('gap', '?')}</b>. "
-            f"When honest methods scatter from {sel.get('knee', '?')} to {spread_hi}, the count is "
+            f"When honest methods scatter from {spread_lo} to {spread_hi}, the count is "
             f"genuinely undetermined."
         )
         report = (

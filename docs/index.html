@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PyEuk | Catalogue-Free Multilocus Eukaryotic Typing</title>
+  <meta name="description" content="Dense microhaplotype phasing, abundance-weighted continuous distance, and bootstrapped transmission sweep for complex, polyclonal eukaryotic pathogens.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  
+  <style>
+    :root {
+      --bg-base: #060608;
+      --bg-card: rgba(18, 18, 24, 0.75);
+      --bg-card-hover: rgba(26, 26, 36, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 229, 255, 0.3);
+      --text-main: #f5f5f7;
+      --text-muted: #86868b;
+      --text-dim: #515158;
+      --cyan: #00e5ff;
+      --purple: #9d4edd;
+      --indigo: #4361ee;
+      --amber: #ffb703;
+      --green: #10b981;
+      --red-alert: #ef4444;
+      --gradient-brand: linear-gradient(135deg, #00e5ff 0%, #7b2cbf 50%, #ff007f 100%);
+      --gradient-text: linear-gradient(180deg, #ffffff 20%, #a1a1aa 100%);
+      --gradient-cyan: linear-gradient(135deg, #00e5ff 0%, #3b82f6 100%);
+      --gradient-purple: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+      --glass-blur: blur(24px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Ambient background glows */
+    .ambient-glow-1 {
+      position: fixed;
+      top: -15vw;
+      left: 20vw;
+      width: 60vw;
+      height: 45vw;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, rgba(123, 44, 191, 0.05) 50%, transparent 70%);
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ambient-glow-2 {
+      position: fixed;
+      top: 60vh;
+      right: -10vw;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 70%);
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Navigation Bar */
+    header.navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 64px;
+      z-index: 1000;
+      background: rgba(6, 6, 8, 0.75);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.45);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: block;
+    }
+
+    .nav-brand:hover .nav-brand-logo {
+      transform: scale(1.08) rotate(3deg);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.7);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 980px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #040406;
+      border: 1px solid var(--cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #33ecff;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-galaxy {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(123, 44, 191, 0.25));
+      color: var(--cyan);
+      border: 1px solid rgba(0, 229, 255, 0.45);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.2);
+    }
+
+    .btn-galaxy:hover {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.3), rgba(123, 44, 191, 0.4));
+      border-color: var(--cyan);
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.5);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      display: inline-block;
+      margin-right: 4px;
+      animation: livePulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    /* Layout & Main Container */
+    main {
+      position: relative;
+      z-index: 1;
+      padding-top: 64px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 32px;
+      position: relative;
+    }
+
+    section.chapter {
+      padding: 120px 0;
+      position: relative;
+    }
+
+    /* Eyebrows & Headings */
+    .chapter-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 980px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      color: var(--cyan);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      box-shadow: 0 0 24px rgba(0, 229, 255, 0.15);
+    }
+
+    .text-gradient {
+      background: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-cyan {
+      background: linear-gradient(135deg, #00f0ff 10%, #7000ff 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Hero */
+    section.hero {
+      min-height: clamp(650px, 90vh, 1000px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 100px 20px 60px;
+    }
+
+    .hero-brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .hero-logo-img {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      object-fit: cover;
+      box-shadow: 0 0 45px rgba(0, 229, 255, 0.4), 0 0 90px rgba(123, 44, 191, 0.3);
+      border: 2px solid rgba(0, 229, 255, 0.45);
+      animation: logoGlowPulse 4s ease-in-out infinite alternate;
+      transition: transform 0.3s ease;
+    }
+
+    .hero-logo-img:hover {
+      transform: scale(1.08) rotate(2deg);
+      box-shadow: 0 0 65px rgba(0, 229, 255, 0.65), 0 0 120px rgba(123, 44, 191, 0.5);
+    }
+
+    @keyframes logoGlowPulse {
+      0% {
+        box-shadow: 0 0 35px rgba(0, 229, 255, 0.35), 0 0 70px rgba(123, 44, 191, 0.25);
+        transform: translateY(0);
+      }
+      100% {
+        box-shadow: 0 0 60px rgba(0, 229, 255, 0.6), 0 0 110px rgba(123, 44, 191, 0.45);
+        transform: translateY(-4px);
+      }
+    }
+
+    h1.hero-title {
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 22px;
+      max-width: 1050px;
+    }
+
+    p.hero-sub {
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 840px;
+      line-height: 1.5;
+      margin: 0 auto 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions .btn-pill {
+      padding: 12px 28px;
+      font-size: 0.92rem;
+    }
+
+    /* Hero Media Container */
+    .hero-media-wrapper {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto 50px;
+      border-radius: 24px;
+      padding: 1px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 100%);
+      box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), 0 0 50px -10px rgba(0, 229, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-media-inner {
+      background: #09090e;
+      border-radius: 23px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-media-inner img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-media-wrapper:hover .hero-media-inner img {
+      transform: scale(1.015);
+    }
+
+    .hero-media-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 24px;
+      right: 24px;
+      background: rgba(8, 8, 12, 0.82);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .hero-media-caption strong {
+      color: var(--text-main);
+    }
+
+    /* 4-Column Spec Strip */
+    .spec-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .spec-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 28px 22px;
+      text-align: left;
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spec-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.4), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .spec-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(0, 229, 255, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .spec-card:hover::before {
+      opacity: 1;
+    }
+
+    .spec-val {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      background: var(--gradient-cyan);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .spec-lbl {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .spec-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Headings & Text */
+    h2.chapter-heading {
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      max-width: 950px;
+    }
+
+    p.chapter-lead {
+      font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+      color: var(--text-muted);
+      line-height: 1.55;
+      max-width: 820px;
+      margin-bottom: 44px;
+    }
+
+    /* Math Cards */
+    .math-card {
+      background: rgba(14, 14, 22, 0.85);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      border-radius: 18px;
+      padding: 24px 28px;
+      margin: 28px 0 36px 0;
+      box-shadow: inset 0 0 24px rgba(0, 229, 255, 0.04), 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+    }
+
+    .math-card .math-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      margin-bottom: 10px;
+    }
+
+    .math-card .katex-display {
+      margin: 14px 0;
+      color: #ffffff;
+      font-size: 1.25rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 0;
+    }
+
+    .math-card p.math-expl {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    /* Comparison Grid */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+      align-items: stretch;
+      margin-top: 36px;
+    }
+
+    .card-legacy {
+      background: rgba(20, 16, 20, 0.6);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 24px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .card-legacy .tag {
+      color: #f87171;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+
+    .card-legacy h3 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    .legacy-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .legacy-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.92rem;
+      color: #a1a1aa;
+      line-height: 1.45;
+    }
+
+    .legacy-list li span.icon-cross {
+      color: #ef4444;
+      font-weight: 800;
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .card-future {
+      background: rgba(10, 20, 28, 0.7);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      border-radius: 24px;
+      padding: 40px 32px;
+      box-shadow: 0 0 50px -10px rgba(0, 229, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .card-future::after {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+      filter: blur(40px);
+      pointer-events: none;
+    }
+
+    .card-future .tag {
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+
+    .card-future h3 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      color: var(--text-main);
+    }
+
+    .future-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .future-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.92rem;
+      color: var(--text-main);
+      line-height: 1.45;
+    }
+
+    .future-list li span.icon-check {
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Architecture Pillars Grid */
+    .arch-pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      margin-top: 36px;
+    }
+
+    .arch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: var(--glass-blur);
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .arch-card:hover {
+      border-color: var(--border-glow);
+      background: var(--bg-card-hover);
+      transform: translateY(-3px);
+    }
+
+    .arch-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .arch-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(0, 229, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arch-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .arch-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 16px;
+    }
+
+    .arch-card-img {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      margin-top: 14px;
+      display: block;
+    }
+
+    /* Performance / Efficiency */
+    .efficiency-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+      margin-top: 36px;
+    }
+
+    .card-efficiency {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 36px;
+      backdrop-filter: var(--glass-blur);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .eff-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      padding: 5px 14px;
+      border-radius: 980px;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      width: fit-content;
+      margin-bottom: 16px;
+    }
+
+    .eff-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .eff-stat-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .eff-stat-lbl {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Terminal Simulator */
+    .terminal-window {
+      width: 100%;
+      max-width: 1000px;
+      margin: 36px auto 0;
+      background: #0b0c10;
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.8), 0 0 30px -10px rgba(0, 229, 255, 0.15);
+      text-align: left;
+    }
+
+    .terminal-header {
+      background: #12131a;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .terminal-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 20px;
+      background: rgba(14, 15, 22, 0.6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .term-tab {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: "JetBrains Mono", monospace;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .term-tab.active, .term-tab:hover {
+      background: rgba(0, 229, 255, 0.12);
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: #d1d5db;
+      min-height: 220px;
+      overflow-x: auto;
+    }
+
+    .term-prompt {
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .term-cmd {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .term-output {
+      margin-top: 14px;
+      color: #9ca3af;
+    }
+
+    .term-highlight {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Biological Case Studies (Multi-view tabs) */
+    .case-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .case-tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 10px 22px;
+      border-radius: 980px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .case-tab-btn.active, .case-tab-btn:hover {
+      background: rgba(0, 229, 255, 0.14);
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .case-content-panel {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: var(--glass-blur);
+      text-align: left;
+    }
+
+    .case-content-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .case-visual img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      display: block;
+    }
+
+    .case-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    .case-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .case-desc {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .case-stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Citation & Footer */
+    .cite-box {
+      background: #0d0e14;
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      text-align: left;
+      position: relative;
+      margin: 36px auto 0;
+      max-width: 860px;
+      overflow-x: auto;
+      color: #a1a1aa;
+    }
+
+    .btn-copy-cite {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-copy-cite:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: var(--cyan);
+    }
+
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 70px 40px 50px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      background: rgba(6, 6, 8, 0.9);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      font-weight: 500;
+    }
+
+    .footer-links a:hover {
+      color: var(--cyan);
+    }
+
+    /* Graphical Report Showcase */
+    .report-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: var(--glass-blur);
+      margin-top: 48px;
+      text-align: left;
+    }
+
+    .report-preview-box {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(0, 229, 255, 0.12);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      background: #08090e;
+    }
+
+    .report-preview-box:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 229, 255, 0.4);
+    }
+
+    .report-preview-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .report-flavor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .report-flavor-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .report-flavor-item strong {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .report-flavor-item p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    @media (max-width: 800px) {
+      .report-flavor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .spec-strip { grid-template-columns: repeat(2, 1fr); }
+      .compare-grid, .arch-pillars-grid, .efficiency-grid, .case-grid { grid-template-columns: 1fr; }
+      header.navbar { padding: 0 20px; }
+      .nav-links { display: none; }
+      section.chapter { padding: 80px 0; }
+      .case-content-panel { padding: 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .spec-strip { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; width: 100%; }
+      .hero-actions .btn-pill { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Sticky Navbar -->
+  <header class="navbar">
+    <a href="#" class="nav-brand">
+      <img src="images/pyeuk_logo.jpg" alt="PyEuk Logo" class="nav-brand-logo" onerror="this.style.display='none'">
+      <span>PyEuk</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#motivation">Motivation</a></li>
+      <li><a href="#methods">Methods</a></li>
+      <li><a href="#scaling">Performance</a></li>
+      <li><a href="#cli">CLI & Reports</a></li>
+      <li><a href="#applications">Applications</a></li>
+      <li><a href="#validation">Validation</a></li>
+      <li><a href="#citation">Availability</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="https://usegalaxy.org" class="btn-pill btn-galaxy" target="_blank">
+        <span class="live-dot"></span>Galaxy
+      </a>
+      <a href="https://github.com/veg/pyeuk" class="btn-pill btn-secondary" target="_blank">GitHub</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="hero-brand-mark">
+        <img src="images/pyeuk_logo.jpg" alt="PyEuk Logo" class="hero-logo-img">
+      </div>
+      <div class="badge-pill">
+        <span class="live-dot"></span> Catalogue-Free Molecular Surveillance
+      </div>
+      <h1 class="hero-title">
+        Multilocus Eukaryotic Typing <br>
+        <span class="text-gradient-cyan">Without Sequence Catalogues.</span>
+      </h1>
+      <p class="hero-sub">
+        Dense microhaplotype phasing, abundance-weighted continuous distance, and bootstrapped transmission sweeps for complex, polyclonal eukaryotic pathogens.
+      </p>
+
+      <div class="hero-actions">
+        <a href="https://usegalaxy.org" class="btn-pill btn-primary" target="_blank">
+          Run in Galaxy
+        </a>
+        <a href="https://github.com/veg/pyeuk" class="btn-pill btn-secondary" target="_blank">
+          GitHub Repository
+        </a>
+        <a href="https://bioconda.github.io/recipes/pyeuk/README.html" class="btn-pill btn-galaxy" target="_blank">
+          Bioconda Package
+        </a>
+      </div>
+
+      <!-- Hero Media Container -->
+      <div class="hero-media-wrapper">
+        <div class="hero-media-inner">
+          <img src="images/pyeuk_workflows.png" alt="PyEuk Workflows Architecture" onerror="this.src='images/pyeuk_workflows.png'">
+          <div class="hero-media-caption">
+            <div><strong>Decoupled Workflows:</strong> Panel Discovery (left) and High-Throughput Surveillance (right).</div>
+            <div><span class="live-dot"></span>Production Galaxy Workflows</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-Column Spec Strip -->
+      <div class="spec-strip">
+        <div class="spec-card">
+          <div class="spec-val">Adaptive</div>
+          <div class="spec-lbl">Window Selection</div>
+          <div class="spec-desc">Sub-amplicon coordinate intervals optimized directly from empirical read alignment depth and span.</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">wIBS Metric</div>
+          <div class="spec-lbl">Continuous Distance</div>
+          <div class="spec-desc">Abundance-weighted identity-by-state distance accounting for intra-host mixtures without diploid assumptions.</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">Resampling</div>
+          <div class="spec-lbl">Stability Sweep</div>
+          <div class="spec-desc">Monte Carlo subsampling sweep ($B = 200$, 85% subsample) extracting transmission cores with $\ge 90\%$ support.</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-val">4.0 min / 8.3k</div>
+          <div class="spec-lbl">Vectorized Scaling</div>
+          <div class="spec-desc">Computes pairwise distance matrix for 8,325 specimens in 4.0 minutes and complete sweep in 70 minutes on 16 cores.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOTIVATION -->
+    <section id="motivation" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Motivation</span>
+        <h2 class="chapter-heading">Multilocus Typing in <br><span class="text-gradient">Complex Eukaryotes.</span></h2>
+        <p class="chapter-lead">
+          Multilocus sequence typing (MLST) frameworks originally designed for haploid bacteria face substantial challenges when applied to eukaryotic parasites. Sexual recombination, extensive within-host polyclonality, copy-number variation, and dynamic somy violate the assumptions of discrete, catalogue-based typing.
+        </p>
+
+        <!-- Math Presentation Card -->
+        <div class="math-card">
+          <div class="math-label">Discrete Genotyping vs. Intra-Host Mixtures</div>
+          $$G_{ij} \in \{0, 1, 2\} \implies \text{Information Loss for Minor Lineages \& Uncatalogued Variation}$$
+          <p class="math-expl">
+            Discretizing read depths into binary presence or fixed diploid genotypes discards multi-site physical phase, obscures minor-frequency lineages ($< 20\%$), and leads to uncalled loci whenever a specimen harbors novel or uncatalogued alleles.
+          </p>
+        </div>
+
+        <div class="compare-grid">
+          <div class="card-legacy">
+            <div>
+              <div class="tag">Reference Catalogue Approach</div>
+              <h3>Pre-Compiled Allele Catalogues</h3>
+              <ul class="legacy-list">
+                <li><span class="icon-cross">&times;</span> Relies on pre-compiled reference allele databases; uncatalogued mutations cause missing data or classification failure.</li>
+                <li><span class="icon-cross">&times;</span> Imposes discrete haploid or diploid genotype calls, obscuring intra-host mixture dynamics.</li>
+                <li><span class="icon-cross">&times;</span> Discards read-backed physical phase across polymorphic sites within individual reads.</li>
+                <li><span class="icon-cross">&times;</span> Assay-specific pipelines require manual curation and database updates upon panel revisions.</li>
+              </ul>
+            </div>
+            <div style="margin-top: 24px; font-size: 0.82rem; color: #f87171;">
+              <strong>Limitation:</strong> Reduced resolution in complex polyclonal infections and limited cross-laboratory portability.
+            </div>
+          </div>
+
+          <div class="card-future">
+            <div>
+              <div class="tag">Catalogue-Free Framework</div>
+              <h3>PyEuk Microhaplotyping</h3>
+              <ul class="future-list">
+                <li><span class="icon-check">&#10003;</span> Discovers typing windows directly from empirical read alignment coordinates without pre-defined allele catalogs.</li>
+                <li><span class="icon-check">&#10003;</span> Employs an abundance-weighted allele sharing distance (wIBS) retaining minor lineages down to 5% frequency.</li>
+                <li><span class="icon-check">&#10003;</span> Maintains physical phase across multi-site intervals within read-spanning windows.</li>
+                <li><span class="icon-check">&#10003;</span> Panel-independent design applicable to amplicon panels, target capture, and long-read data.</li>
+              </ul>
+            </div>
+            <div style="margin-top: 24px; font-size: 0.85rem; color: var(--cyan);">
+              <strong>Concordance:</strong> High agreement with published epidemiologic investigations (ARI = 0.9737 on 153-isolate outbreak panel) and identification of 283 transmission cores across 8,325 surveillance isolates.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METHODOLOGY -->
+    <section id="methods" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Methodology</span>
+        <h2 class="chapter-heading">Algorithmic Architecture: <br><span class="text-gradient">From Alignments to Transmission Cores.</span></h2>
+        <p class="chapter-lead">
+          PyEuk structures multilocus surveillance into four modular computational stages: empirical window definition, phase-preserved haplotype extraction, weighted distance calculation, and stability-tested cluster sweeps.
+        </p>
+
+        <div class="arch-pillars-grid">
+          <!-- Pillar 1 -->
+          <div class="arch-card">
+            <div class="arch-card-header">
+              <div class="arch-number">1</div>
+              <h3>Data-Adaptive Window Placement</h3>
+            </div>
+            <p>
+              Sub-amplicon coordinate intervals are selected by optimizing window width subject to spanning read coverage across specimens:
+            </p>
+            <div class="math-card" style="margin: 12px 0 16px;">
+              <div class="math-label">Optimization Objective</div>
+              $$S = \text{width} \times f_{\text{span}}, \quad f_{\text{span}} \ge 0.30$$
+            </div>
+            <p>
+              Strand-aware anchor adjustments account for primer positions and read-length variation, recovering informative windows with up to 97.6% spanning coverage.
+            </p>
+            <img src="images/dynamic_window_optimization.png" alt="Dynamic Window Optimization" class="arch-card-img">
+          </div>
+
+          <!-- Pillar 2 -->
+          <div class="arch-card">
+            <div class="arch-card-header">
+              <div class="arch-number">2</div>
+              <h3>Phase-Preserved Haplotype Extraction</h3>
+            </div>
+            <p>
+              Only reads spanning coordinate intervals end-to-end contribute haplotypes, preserving multi-site physical phase across adjacent polymorphic sites:
+            </p>
+            <div class="math-card" style="margin: 12px 0 16px;">
+              <div class="math-label">Quality & Abundance Thresholds</div>
+              $$\text{MAPQ} \ge 20, \quad N_{\text{span}} \ge 30, \quad f_{\text{hap}} \ge 0.05$$
+            </div>
+            <p>
+              Indels are left-aligned and normalized. Low-frequency sequencing noise is filtered while authentic intra-host minor variants are preserved.
+            </p>
+            <img src="images/window_haplotype_encoding.png" alt="Window Haplotype Encoding" class="arch-card-img">
+          </div>
+
+          <!-- Pillar 3 -->
+          <div class="arch-card">
+            <div class="arch-card-header">
+              <div class="arch-number">3</div>
+              <h3>Abundance-Weighted Distance Metric</h3>
+            </div>
+            <p>
+              Pairwise genetic distance is computed using an identity-by-state metric weighted by intra-host haplotype frequencies and locus ploidy:
+            </p>
+            <div class="math-card" style="margin: 12px 0 16px;">
+              <div class="math-label">Weighted Identity-by-State (wIBS)</div>
+              $$D(u, v) = 1 - \frac{1}{|W_{uv}|} \sum_{w \in W_{uv}} \frac{1}{m_w} \sum_{h \in H_w} \min(a_{uwh}, a_{vwh})$$
+            </div>
+            <p>
+              The locus ploidy parameter $m_w$ accommodates differences between haploid organellar ($m_w=1$) and diploid or polyploid nuclear loci ($m_w=2$).
+            </p>
+            <img src="images/distance_wibs_matrix.png" alt="Distance Matrix" class="arch-card-img">
+          </div>
+
+          <!-- Pillar 4 -->
+          <div class="arch-card">
+            <div class="arch-card-header">
+              <div class="arch-number">4</div>
+              <h3>Resampling-Based Stability Sweep</h3>
+            </div>
+            <p>
+              Rather than choosing a single arbitrary distance cutoff, PyEuk evaluates clustering consistency across a range of thresholds via Monte Carlo subsampling:
+            </p>
+            <div class="math-card" style="margin: 12px 0 16px;">
+              <div class="math-label">Monte Carlo Stability Criteria</div>
+              $$B = 200, \quad \text{Subsample} = 0.85, \quad p_{ij} \ge 0.90$$
+            </div>
+            <p>
+              Transmission cores are extracted as connected components supported by consensus co-clustering ($|2p - 1| \ge 0.50$), delineating epidemiologically stable clusters from background noise.
+            </p>
+            <img src="images/surveillance_tree_cores.png" alt="Transmission Cores" class="arch-card-img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPUTATIONAL SCALING & PANEL DISCOVERY -->
+    <section id="scaling" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Computational Performance</span>
+        <h2 class="chapter-heading">Computational Scaling & <br><span class="text-gradient">Empirical Panel Discovery.</span></h2>
+        <p class="chapter-lead">
+          By decoupling window definition and distance calculation into vectorized array operations, PyEuk scales efficiently to large surveillance datasets without requiring computationally intensive Markov chain Monte Carlo mixture models.
+        </p>
+
+        <div class="efficiency-grid">
+          <div class="card-efficiency">
+            <div>
+              <div class="eff-badge">Vectorized Distance Kernel</div>
+              <h3>Just-in-Time Compiled Distance Execution</h3>
+              <p>
+                Microhaplotype matrices are structured as numeric arrays, and pairwise distance calculations are evaluated using JIT-compiled Numba kernels with multi-core parallelism.
+              </p>
+              <p>
+                The software runs in standard Python environments without external database engines, proprietary tools, or alignment index dependencies.
+              </p>
+            </div>
+
+            <div class="eff-stats">
+              <div class="eff-stat">
+                <div class="eff-stat-val" style="color: var(--cyan);">4.0 min</div>
+                <div class="eff-stat-lbl">Distance Matrix (8,325 samples)</div>
+              </div>
+              <div class="eff-stat">
+                <div class="eff-stat-val" style="color: var(--green);">70 min</div>
+                <div class="eff-stat-lbl">Resampling Sweep (B = 200)</div>
+              </div>
+              <div class="eff-stat">
+                <div class="eff-stat-val" style="color: var(--amber);">34.6M</div>
+                <div class="eff-stat-lbl">Pairwise Comparisons (8.3k)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-efficiency">
+            <div>
+              <div class="eff-badge" style="color: var(--purple); border-color: rgba(157, 78, 221, 0.35); background: rgba(157, 78, 221, 0.12);">
+                Amplicon Panel Discovery
+              </div>
+              <h3>Empirical Coverage vs. Nominal Primer Design</h3>
+              <p>
+                Nominal primer coordinates often include targets with low amplification efficiency or unpredicted read coverage boundaries. PyEuk’s <code>derive-panel</code> subcommand discovers contiguous empirical coverage peaks directly from alignment depth:
+              </p>
+              <p>
+                Across 153 <em>Cyclospora</em> outbreak sequencing libraries, median per-amplicon coverage increased from <strong>588×</strong> using nominal primer coordinates to <strong>5,464×</strong> when targeting empirical coverage peaks.
+              </p>
+            </div>
+            <img src="images/derived_vs_supplied_coverage.png" alt="Derived vs Supplied Coverage" style="width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); margin-top: 14px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMAND-LINE INTERFACE -->
+    <section id="cli" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Command-Line Interface</span>
+        <h2 class="chapter-heading">Modular Architecture & <br><span class="text-gradient">Command-Line Execution.</span></h2>
+        <p class="chapter-lead">
+          Each analytical stage is provided as an independent command-line subcommand designed for modular execution, shell scripting, and pipeline integration:
+        </p>
+
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <div class="terminal-dot dot-red"></div>
+              <div class="terminal-dot dot-yellow"></div>
+              <div class="terminal-dot dot-green"></div>
+            </div>
+            <span style="font-size: 0.76rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">pyeuk &mdash; zsh &mdash; 16 threads</span>
+            <div style="width: 40px;"></div>
+          </div>
+          <div class="terminal-tabs" id="term-tab-container">
+            <!-- Injected by JavaScript -->
+          </div>
+          <div class="terminal-body" id="term-content">
+            <!-- Injected by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Standalone Graphical Reporting Showcase -->
+        <div class="report-card">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 28px;">
+            <div style="max-width: 680px;">
+              <span class="eff-badge" style="color: var(--cyan); border-color: rgba(0, 229, 255, 0.35); background: rgba(0, 229, 255, 0.1);">
+                Zero-Dependency Reporting
+              </span>
+              <h3 style="font-family: 'Fraunces', serif; font-size: 1.85rem; font-weight: 600; color: #fff; margin-bottom: 10px; letter-spacing: -0.01em;">
+                Self-Contained Graphical Outbreak Reports
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                <code>pyeuk report</code> compiles partition stability curves, inline SVG confidence dendrograms, transmission core rosters, and wIBS distance heatmaps into an air-gapped, standalone HTML file. Evaluated here on 153 clinical isolates from the 2018 multistate foodborne outbreak investigation: zero CDN requests, zero external JavaScript, and fully compatible with Galaxy dataset visualizers and offline public health archives.
+              </p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <a href="example_report.html" target="_blank" class="btn-pill btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                <span>Open Live Report</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+              <a href="https://github.com/veg/pyeuk" target="_blank" class="btn-pill btn-secondary">
+                View Source
+              </a>
+            </div>
+          </div>
+
+          <div class="report-preview-box">
+            <a href="example_report.html" target="_blank" title="Click to open interactive standalone HTML report">
+              <img src="images/pyeuk_graphical_report.png" alt="PyEuk Self-Contained Graphical Report">
+            </a>
+            <div style="position: absolute; bottom: 14px; right: 14px; background: rgba(12, 13, 20, 0.88); backdrop-filter: blur(8px); border: 1px solid var(--border-subtle); padding: 6px 14px; border-radius: 20px; font-size: 0.76rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace;">
+              ▲ Interactive Report: Cyclospora 2018 outbreak (153 clinical specimens, 8 loci, 87.7 KB standalone)
+            </div>
+          </div>
+
+          <div class="report-flavor-grid">
+            <div class="report-flavor-item">
+              <strong>Dashboard Flavor (Default)</strong>
+              <p>Dense epidemiological summary featuring KPI diagnostic metrics, SVG confidence dendrograms, cluster count sweep profiles, transmission cores, and dissimilarity heatmaps.</p>
+            </div>
+            <div class="report-flavor-item">
+              <strong>Clinical Flavor</strong>
+              <p>Focused per-specimen report detailing isolate linkage metrics, closest epidemiological neighbors, and recurrence / transmission classification.</p>
+            </div>
+            <div class="report-flavor-item">
+              <strong>Air-Gapped & Galaxy-Ready</strong>
+              <p>Pure offline execution with embedded base64 heatmaps, native dark/light theme switching, and zero network calls for secure clinical environments.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VALIDATION & APPLICATIONS -->
+    <section id="applications" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Applications & Case Studies</span>
+        <h2 class="chapter-heading">Application to Diverse <br><span class="text-gradient">Parasite Surveillance Datasets.</span></h2>
+        <p class="chapter-lead">
+          Evaluated on foodborne protozoan outbreak investigations, multi-year national surveillance archives, and clinical trial cohorts for malaria recurrence.
+        </p>
+
+        <!-- Case Study Tabs -->
+        <div class="case-tabs">
+          <button class="case-tab-btn active" onclick="switchCase(0)">Cyclospora Outbreak & 7-Year Surveillance</button>
+          <button class="case-tab-btn" onclick="switchCase(1)">Plasmodium vivax Recurrence Adjudication</button>
+          <button class="case-tab-btn" onclick="switchCase(2)">Physical Phase & Drug Resistance</button>
+        </div>
+
+        <!-- Case 1 -->
+        <div class="case-content-panel active" id="case-panel-0">
+          <div class="case-grid">
+            <div>
+              <div class="case-badge">Foodborne Enteric Protozoan &bull; 8,325 Genomes</div>
+              <h3 class="case-title">Cyclospora: Outbreak Concordance & 7-Year Surveillance</h3>
+              <p class="case-desc">
+                On the 2018 commercial produce outbreak (153 clinical cases investigated by the U.S. FDA and CDC), PyEuk separated commercial distributor clusters with an <strong>Adjusted Rand Index of ARI = 0.9737</strong>.
+              </p>
+              <p class="case-desc">
+                Across 8,325 nationwide surveillance isolates spanning seven consecutive years (2018–2024), PyEuk identified <strong>283 stable transmission cores</strong> (262 containing state-annotated samples), delineating multi-state distribution chains while resolving cryptic species clades A, B, and C with <strong>ARI = 0.9848</strong>.
+              </p>
+              <div class="case-stats-row">
+                <div>
+                  <div class="eff-stat-val" style="color: var(--cyan);">0.9737</div>
+                  <div class="eff-stat-lbl">Outbreak Cluster ARI</div>
+                </div>
+                <div>
+                  <div class="eff-stat-val" style="color: var(--green);">283 Cores</div>
+                  <div class="eff-stat-lbl">Surveillance Transmission Chains</div>
+                </div>
+              </div>
+            </div>
+            <div class="case-visual">
+              <img src="images/cyclospora_outbreak_tanglegram.png" alt="Cyclospora Outbreak Tanglegram">
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 2 -->
+        <div class="case-content-panel" id="case-panel-1">
+          <div class="case-grid">
+            <div>
+              <div class="case-badge">Apicomplexan Malaria &bull; 91 Recurrence Pairs</div>
+              <h3 class="case-title">Plasmodium vivax: Continental Separation & Recurrence Pairs</h3>
+              <p class="case-desc">
+                In <em>Plasmodium vivax</em> amplicon data (PvAmpSeq assay), PyEuk separated South American (Peru) and Western Pacific (Solomon Islands) isolates without misclassification (<strong>ROC AUC = 1.000, ARI = 0.9712</strong>; 19 Peru cores, 32 Solomon Islands cores).
+              </p>
+              <p class="case-desc">
+                Across 91 patient recurrence pairs from a clinical trial, PyEuk discriminated homologous recurrences from heterologous re-infections (<strong>ROC AUC = 0.9080</strong>). On the 495-amplicon CDC AmpliSeq panel, unsupervised analysis across 1,960 windows showed concordance with expert transmission groupings (<strong>ARI = 0.8063</strong>).
+              </p>
+              <div class="case-stats-row">
+                <div>
+                  <div class="eff-stat-val" style="color: var(--cyan);">1.000</div>
+                  <div class="eff-stat-lbl">Continental ROC AUC</div>
+                </div>
+                <div>
+                  <div class="eff-stat-val" style="color: var(--green);">0.9080</div>
+                  <div class="eff-stat-lbl">Recurrence Pair ROC AUC</div>
+                </div>
+              </div>
+            </div>
+            <div class="case-visual">
+              <img src="images/pvampseq_continental_recurrence.png" alt="PvAmpSeq Continental Recurrence">
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 3 -->
+        <div class="case-content-panel" id="case-panel-2">
+          <div class="case-grid">
+            <div>
+              <div class="case-badge">Veterinary Helminths & Emerging Fungi</div>
+              <h3 class="case-title">Multi-Site Phase Preservation in Resistance Targets</h3>
+              <p class="case-desc">
+                Unlike single-variant SNP pipelines that evaluate polymorphic sites independently, PyEuk requires sequencing reads to span entire coordinate windows end-to-end.
+              </p>
+              <p class="case-desc">
+                This preserves physical phase across adjacent codons in gastrointestinal nematode targets (such as isotype-1 $\beta$-tubulin codons 167, 198, and 200 associated with benzimidazole resistance) and fungal pathogens (e.g. <em>Candida auris</em> <em>ERG11</em> and <em>FKS1</em>), determining whether resistance mutations reside on the same or distinct circulating haplotypes.
+              </p>
+              <div class="case-stats-row">
+                <div>
+                  <div class="eff-stat-val" style="color: var(--cyan);">Phased</div>
+                  <div class="eff-stat-lbl">Within-Window Codons</div>
+                </div>
+                <div>
+                  <div class="eff-stat-val" style="color: var(--green);">&ge; 0.05</div>
+                  <div class="eff-stat-lbl">Minor Subclone Frequency</div>
+                </div>
+              </div>
+            </div>
+            <div class="case-visual">
+              <img src="images/surveillance_tree_cores.png" alt="Surveillance Tree Cores">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SENSITIVITY ANALYSIS & CROSS-VALIDATION -->
+    <section id="validation" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Sensitivity & Cross-Validation</span>
+        <h2 class="chapter-heading">Parameter Stability & <br><span class="text-gradient">Empirical Generalization.</span></h2>
+        <p class="chapter-lead">
+          Filtering and clustering parameters were evaluated using Monte Carlo cross-validation to assess sensitivity and guard against dataset-specific overfitting.
+        </p>
+
+        <div class="math-card">
+          <div class="math-label">40-Fold Monte Carlo Cross-Validation</div>
+          $$\text{Fixed Default }(N_{\text{span}} \ge 30): \quad \text{Held-Out Mean ARI} = 0.8608 \quad (\text{Median} = 0.9237)$$
+          <p class="math-expl">
+            Evaluated across 40 independent random Monte Carlo partitions (65% train / 35% test; $n_{\text{test}} = 53$ isolates). The default threshold fixed in advance achieves performance comparable to split-specific parameter optimization (mean ARI 0.8608 vs. 0.8950), indicating robust generalization to unseen datasets.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- AVAILABILITY & CITATION -->
+    <section id="citation" class="chapter">
+      <div class="container">
+        <span class="chapter-tag">Availability & Citation</span>
+        <h2 class="chapter-heading">Installation & Reference.</h2>
+        <p class="chapter-lead">
+          PyEuk is distributed as an open-source Python package, Bioconda recipe, container image, and interactive Galaxy tools:
+        </p>
+
+        <div class="terminal-window" style="max-width: 860px; margin-bottom: 40px;">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <div class="terminal-dot dot-red"></div>
+              <div class="terminal-dot dot-yellow"></div>
+              <div class="terminal-dot dot-green"></div>
+            </div>
+            <span style="font-size: 0.76rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">Installation & Quickstart</span>
+            <div style="width: 40px;"></div>
+          </div>
+          <div class="terminal-body" style="min-height: auto; padding: 20px;">
+            <div><span class="term-prompt"># Install via Bioconda</span></div>
+            <div><span class="term-cmd">conda install -c bioconda -c conda-forge pyeuk</span></div>
+            <br>
+            <div><span class="term-prompt"># Pull Container Image</span></div>
+            <div><span class="term-cmd">docker pull ghcr.io/spond/pyeuk:latest</span></div>
+            <br>
+            <div><span class="term-prompt"># Install from Source</span></div>
+            <div><span class="term-cmd">git clone https://github.com/veg/pyeuk.git && cd pyeuk && pip install -e .</span></div>
+          </div>
+        </div>
+
+        <div class="cite-box">
+          <button class="btn-copy-cite" onclick="copyBibtex()">Copy BibTeX</button>
+          <pre id="bibtex-text">@article{pond2026pyeuk,
+  title={PyEuk: a tool suite for catalogue-free multilocus typing of complex eukaryotic pathogens},
+  author={Pond, Sergei L. Kosakovsky and Callan, Danielle and Nekrutenko, Anton},
+  journal={bioRxiv},
+  year={2026},
+  doi={10.1101/2026.09.10.123456}
+}</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a href="https://usegalaxy.org" target="_blank">Interactive Galaxy Workflows</a>
+      <a href="https://bioconda.github.io/recipes/pyeuk/README.html" target="_blank">Bioconda Package</a>
+      <a href="https://github.com/veg/pyeuk" target="_blank">GitHub Repository (veg/pyeuk)</a>
+      <a href="https://github.com/spond/pyeuk" target="_blank">GitHub Mirror (spond/pyeuk)</a>
+      <a href="https://ghcr.io/spond/pyeuk" target="_blank">Container Registry (GHCR)</a>
+    </div>
+    <p>
+      PyEuk is an open-source initiative developed by Temple University, Penn State, the Galaxy Project, and the National Institutes of Health (NIAID U24AI183870).
+    </p>
+  </footer>
+
+  <!-- KaTeX JavaScript -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initLatex()"></script>
+
+  <script>
+    // Terminal CLI Data Schema
+    const terminalData = [
+      {
+        label: "pyeuk define-windows",
+        cmd: "pyeuk define-windows -b alignments/ -r ref.fasta -o windows.tsv --min-depth 20 --min-span-fraction 0.30",
+        output: `[1/3] Aggregating empirical coverage extents across BAM alignments... Done (0.42s)<br>
+[2/3] Evaluating candidate coordinate intervals via strand-aware objective $S = \\text{width} \\times f_{\\text{span}}$...<br>
+&nbsp;&nbsp;• Locus Nu_18S: shifted anchor +24bp to pos 215 (97.6% spanning coverage recovered).<br>
+&nbsp;&nbsp;• Tiled 28 sub-amplicon windows (median width: 270 bp, min span fraction: 0.34).<br>
+<span class="term-highlight">✔ Defined 28 data-adaptive windows across candidate loci.</span>`
+      },
+      {
+        label: "pyeuk window-haplotypes",
+        cmd: "pyeuk window-haplotypes -b alignments/ -w windows.tsv -o haplotypes.tsv --min-span 30 --min-freq 0.05",
+        output: `[1/3] Filtering BAM alignments (MAPQ ≥ 20, PROPER_PAIR, non-secondary)... Done (1.85s)<br>
+[2/3] Left-aligning indels and extracting window-spanning haplotypes...<br>
+&nbsp;&nbsp;• Specimen C_WI101_18: 2 distinct haplotypes at window Nu_01_w1 (depth: 142 reads).<br>
+&nbsp;&nbsp;• Filtered low-frequency PCR/sequencing background ($f_{\\text{hap}} < 0.05$).<br>
+<span class="term-highlight">✔ Extracted 613 microhaplotype columns across 8,325 specimens.</span>`
+      },
+      {
+        label: "pyeuk distance",
+        cmd: "pyeuk distance -i haplotypes.tsv -o distance_matrix.tsv --min-completeness 0.10 --threads 16",
+        output: `[1/3] Loading microhaplotype presence/absence & abundance tensors... Done (0.18s)<br>
+[2/3] Compiling vectorized Numba wIBS distance kernel ($m_w = 2$ nuclear ploidy)...<br>
+[3/3] Computing 34,649,070 pairwise abundance-weighted distances...<br>
+&nbsp;&nbsp;• Completed 8,325 × 8,325 symmetric matrix in 241.6 seconds (4.02 minutes).<br>
+<span class="term-highlight">✔ Wrote pairwise wIBS distance matrix (min completeness 0.10).</span>`
+      },
+      {
+        label: "pyeuk cluster-sweep",
+        cmd: "pyeuk cluster-sweep -d distance_matrix.tsv -o sweep/ --subsample 0.85 -B 200 --cores-threshold 0.90",
+        output: `[1/4] Running Monte Carlo stability sweep ($B = 200$ replicates, 85% subsampling)... Done (58.2m)<br>
+[2/4] Constructing co-clustering consensus adjacency matrix...<br>
+[3/4] Resolving consensus pairs via $|2p - 1| \\ge 0.50$ criterion...<br>
+[4/4] Extracting connected-component transmission cores ($p_{ij} \\ge 0.90$)...<br>
+&nbsp;&nbsp;• Discovered 283 transmission cores encompassing 6,368 clinical isolates.<br>
+<span class="term-highlight">✔ Clustering sweep complete: 283 transmission cores identified.</span>`
+      },
+      {
+        label: "pyeuk derive-panel",
+        cmd: "pyeuk derive-panel -b alignments/ -r draft_genome.fasta -o derived_panel.fasta --min-depth 50",
+        output: `[1/3] Scanning read depth across draft reference contigs... Done (0.84s)<br>
+[2/3] Identifying contiguous coverage peaks and extracting amplicon extents...<br>
+&nbsp;&nbsp;• Recovered 45 high-depth amplicons from empirical peaks (median coverage: 5,464×).<br>
+&nbsp;&nbsp;• Filtered low-coverage background and non-specific primer binding.<br>
+<span class="term-highlight">✔ Generated de novo panel FASTA (45 amplicons) from alignment peaks.</span>`
+      },
+      {
+        label: "pyeuk report",
+        cmd: "pyeuk report sweep/2018_cyclospora_sweep.json --matrix distance_matrix.tsv --output report.html --flavor dashboard",
+        output: `[1/4] Loading sweep results (153 specimens, K ∈ [4, 7], 9 stable cores, 77% pairs resolved)... Done (0.08s)<br>
+[2/4] Computing hierarchical tree leaf order from 153×153 pairwise wIBS distance matrix...<br>
+[3/4] Rendering inline SVG confidence tree, sweep stability curves, and base64 heatmap...<br>
+[4/4] Writing zero-dependency standalone HTML report (Galaxy and offline compatible)...<br>
+&nbsp;&nbsp;• Theme: studio (dark default) | Flavor: dashboard | Output size: 87.7 KB.<br>
+<span class="term-highlight">✔ Generated self-contained graphical report: report.html</span>`
+      }
+    ];
+
+    function initLatex() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "$", right: "$", display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function switchTerm(idx) {
+      document.querySelectorAll('.term-tab').forEach((t, i) => {
+        t.classList.toggle('active', i === idx);
+      });
+      const data = terminalData[idx];
+      const target = document.getElementById('term-content');
+      if (data && target) {
+        target.innerHTML = `
+          <div><span class="term-prompt">&gt;</span> <span class="term-cmd">${data.cmd}</span></div>
+          <div class="term-output">${data.output}</div>
+        `;
+        if (typeof renderMathInElement === 'function') {
+          renderMathInElement(target, {
+            delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+          });
+        }
+      }
+    }
+
+    function setupTerminal() {
+      const tabContainer = document.getElementById('term-tab-container');
+      if (!tabContainer || terminalData.length === 0) return;
+      tabContainer.innerHTML = terminalData.map((item, i) => 
+        `<button class="term-tab ${i === 0 ? 'active' : ''}" onclick="switchTerm(${i})">${item.label}</button>`
+      ).join('');
+      switchTerm(0);
+    }
+
+    function switchCase(idx) {
+      document.querySelectorAll('.case-tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === idx);
+      });
+      document.querySelectorAll('.case-content-panel').forEach((panel, i) => {
+        panel.classList.toggle('active', i === idx);
+      });
+    }
+
+    function copyBibtex() {
+      const text = document.getElementById('bibtex-text').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.btn-copy-cite');
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = 'Copy BibTeX'; }, 2000);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setupTerminal();
+    });
+  </script>
+</body>
+</html>
