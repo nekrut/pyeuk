@@ -292,12 +292,14 @@ steps:
       and is usually the one that decides whether a window survives.
     in:
       input: filter_bam/outputsam
-      ref: panel
+      reference_source|ref_file: panel
       windows: windows_bed
       gates|min_span: min_span
       gates|min_freq: min_freq
       gates|min_reads: min_reads
     state:
+      reference_source:
+        reference_source_selector: history
       specimen: ''
       gates:
         denoise_edits: 1

@@ -191,8 +191,10 @@ steps:
       lose their locus entirely.
     in:
       bams: bams
-      ref: panel
+      reference_source|ref_file: panel
     state:
+      reference_source:
+        reference_source_selector: history
       sample: 20
       min_spanning: 0.30
       legacy_spanning_target: ''
@@ -216,12 +218,14 @@ steps:
       and is usually the one that decides whether a window survives.
     in:
       input: bams
-      ref: panel
+      reference_source|ref_file: panel
       windows: define_windows/windows
       gates|min_span: min_span
       gates|min_freq: min_freq
       gates|min_reads: min_reads
     state:
+      reference_source:
+        reference_source_selector: history
       specimen: ''
       gates:
         denoise_edits: 1
